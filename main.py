@@ -3,9 +3,11 @@ from tkinter import filedialog
 import re
 
 class Lexema:
-    def __init__(self, tipo, valor):
+    def __init__(self, tipo, valor, linea=None, columna=None):
         self.tipo = tipo
         self.valor = valor
+        self.linea = linea
+        self.columna = columna
 
 class Error:
     def __init__(self, mensaje, fila, columna):
@@ -30,9 +32,11 @@ def analizadorLexico(textAreaInicial, textAreaFinal):
     # Obtener el texto del text area
     texto = textAreaInicial.get("1.0", "end")
     
-    # Iterar sobre cada caracter del texto
+    # Inicializar las variables de fila y columna
     fila = 1
     columna = 0
+    
+    # Iterar sobre cada caracter del texto
     for char in texto:
         columna += 1
         # Se verifica si está dentro de una cadena de texto
@@ -53,34 +57,35 @@ def analizadorLexico(textAreaInicial, textAreaFinal):
             if palabra:
                 # Verificar si la palabra es una palabra reservada
                 if palabra in ['Inicio', 'Encabezado', 'TituloPagina', 'Cuerpo', 'Titulo', 'texto', 'posicion', 'tamaño', 'color', 'Fondo', 'Parrafo', 'fuente', 'Texto', 'Codigo', 'Negrita', 'Subrayado', 'Tachado', 'Cursiva', 'Tabla', 'filas', 'columnas', 'elemento', 'fila', 'columna', 'Salto', 'cantidad']:
-                    lexemas.append(Lexema("PALABRA_RESERVADA", palabra))
+                    lexemas.append(Lexema("Palabra Reservada", palabra, fila, columna - len(palabra)))
                 elif palabra.isdigit():
-                    lexemas.append(Lexema("NUMERO", palabra))
+                    lexemas.append(Lexema("Número", palabra, fila, columna - len(palabra)))
                 else:
-                    lexemas.append(Lexema("PALABRA", palabra))
+                    lexemas.append(Lexema("Cadena", palabra, fila, columna - len(palabra)))
                 palabra = ""
             
             # Otros caracteres especiales
             if char in [',']:
-                lexemas.append(Lexema("COMA", char))
+                lexemas.append(Lexema("Coma", char, fila, columna))
             elif char in ['.']:
-                lexemas.append(Lexema("PUNTO", char))
+                lexemas.append(Lexema("Punto", char, fila, columna))
             elif char in ['{']:
-                lexemas.append(Lexema("Llave de apertura", char))
+                lexemas.append(Lexema("Llave de apertura", char, fila, columna))
             elif char in ['}']:
-                lexemas.append(Lexema("Llave de cierre", char))
+                lexemas.append(Lexema("Llave de cierre", char, fila, columna))
             elif char in [':']:
-                lexemas.append(Lexema("Dos puntos", char))
+                lexemas.append(Lexema("Dos puntos", char, fila, columna))
             elif char in ['[']:
-                lexemas.append(Lexema("Corchete de apertura", char))
+                lexemas.append(Lexema("Corchete de apertura", char, fila, columna))
             elif char in [']']:
-                lexemas.append(Lexema("Corchete de cierre", char))    
+                lexemas.append(Lexema("Corchete de cierre", char, fila, columna))    
             elif char in [';']:
-                lexemas.append(Lexema("Punto y coma", char))                            
+                lexemas.append(Lexema("Punto y coma", char, fila, columna))                            
             elif char in [' ']:
                 continue
             elif char == '\n':
                 fila += 1
+                columna = 0  # Reiniciar la columna cuando se encuentra un salto de línea
                 continue                                        
             else:
                 errores.append(Error(f"{char}", fila, columna))
@@ -88,11 +93,11 @@ def analizadorLexico(textAreaInicial, textAreaFinal):
     # Verificar si hay una palabra aún por agregar
     if palabra:
         if palabra in ['Inicio', 'Encabezado', 'TituloPagina', 'Cuerpo', 'Titulo', 'texto', 'posicion', 'tamaño', 'color', 'Fondo', 'Parrafo', 'fuente', 'Texto', 'Codigo', 'Negrita', 'Subrayado', 'Tachado', 'Cursiva', 'Tabla', 'filas', 'columnas', 'elemento', 'fila', 'columna', 'Salto', 'cantidad']:
-            lexemas.append(Lexema("PALABRA_RESERVADA", palabra))
+            lexemas.append(Lexema("Palabra Reservada", palabra, fila, columna - len(palabra)))
         elif palabra.isdigit():
-            lexemas.append(Lexema("NUMERO", palabra))
+            lexemas.append(Lexema("Número", palabra, fila, columna - len(palabra)))
         else:
-            lexemas.append(Lexema("PALABRA", palabra))
+            lexemas.append(Lexema("Cadena", palabra, fila, columna - len(palabra)))
     
     imprimirLexemasYErrores(lexemas, errores)
 
@@ -112,6 +117,17 @@ def imprimirLexemasYErrores(lexemas, errores):
                 caracteres_invalidos[error.mensaje]["cantidad"] += 1
         for caracter, info in caracteres_invalidos.items():
             f.write(f"<tr><td>{caracter}</td><td>{info['cantidad']}</td><td>{info['fila']}</td><td>{info['columna']}</td></tr>\n")
+        f.write("</table>\n")
+        f.write("</body>\n</html>")
+
+        # Escribir los lexemas en un archivo HTML
+    with open("lexemas.html", "w", encoding='utf-8') as f:
+        f.write("<html>\n<head>\n<title>Listado de Tokens y Lexemas</title>\n</head>\n<body>\n")
+        f.write("<h1>Listado de Tokens y Lexemas</h1>\n")
+        f.write("<table border='1'>\n")
+        f.write("<tr><th>Token</th><th>Lexema</th><th>Línea</th><th>Columna</th></tr>\n")
+        for lexema in lexemas:
+            f.write(f"<tr><td>{lexema.tipo}</td><td>{lexema.valor}</td><td>{lexema.linea}</td><td>{lexema.columna}</td></tr>\n")
         f.write("</table>\n")
         f.write("</body>\n</html>")
 
