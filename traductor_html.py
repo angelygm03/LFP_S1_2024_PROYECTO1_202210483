@@ -46,6 +46,8 @@ def traducir_a_html(tokens):
         elif token == 'TITULO':
             alineacion = extraer_valor(valor, 'posicion', 'left')
             alineacion = 'left' if alineacion == 'izquierda' else alineacion
+            alineacion = 'center' if alineacion == 'centro' else alineacion
+            alineacion = 'right' if alineacion == 'derecha' else alineacion  
             # Pasar el tamaño del titulo a la etiqueta HTML 
             tamaño = extraer_valor(valor, 'tamaño', 't1')
             etiqueta_encabezado = tamanos_a_encabezados.get(tamaño, 'h1')
@@ -53,15 +55,20 @@ def traducir_a_html(tokens):
         elif token == 'PARRAFO':
             alineacion = extraer_valor(valor, 'posicion', 'left')
             alineacion = 'left' if alineacion == 'izquierda' else alineacion
+            alineacion = 'center' if alineacion == 'centro' else alineacion
+            alineacion = 'right' if alineacion == 'derecha' else alineacion  
             cuerpo += f"<p style='color:{convertir_color_a_hexadecimal(extraer_valor(valor, 'color'))}; text-align:{alineacion};'>{extraer_valor(valor, 'texto')}</p>\n"
         elif token == 'TEXTO':
             alineacion = extraer_valor(valor, 'posicion', 'left')
             alineacion = 'left' if alineacion == 'izquierda' else alineacion
+            alineacion = 'center' if alineacion == 'centro' else alineacion
+            alineacion = 'right' if alineacion == 'derecha' else alineacion  
             cuerpo += f"<span style='font-family:{extraer_valor(valor, 'fuente')}; color:{convertir_color_a_hexadecimal(extraer_valor(valor, 'color'))}; font-size:{extraer_valor(valor, 'tamaño')}px; text-align:{alineacion};'>{extraer_valor(valor, 'texto')}</span>\n"
         elif token == 'CODIGO':
             alineacion = extraer_valor(valor, 'posicion', 'left')
             alineacion = 'left' if alineacion == 'izquierda' else alineacion
-            alineacion = 'center' if alineacion == 'centro' else alineacion  
+            alineacion = 'center' if alineacion == 'centro' else alineacion
+            alineacion = 'right' if alineacion == 'derecha' else alineacion  
             cuerpo += f"<code style='color:{convertir_color_a_hexadecimal(extraer_valor(valor, 'color'))}; text-align:{alineacion};'>{extraer_valor(valor, 'texto')}</code>\n"
         elif token == 'NEGRITA':
             alineacion = extraer_valor(valor, 'posicion', 'left')

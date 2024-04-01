@@ -56,7 +56,9 @@ def analizadorLexico(textAreaInicial, textAreaFinal):
             elif char in ['[']:
                 lexemas.append(Lexema("Corchete de apertura", char, fila, columna))
             elif char in [']']:
-                lexemas.append(Lexema("Corchete de cierre", char, fila, columna))    
+                lexemas.append(Lexema("Corchete de cierre", char, fila, columna))  
+            elif char in ['=']:
+                lexemas.append(Lexema("Igual", char, fila, columna))                     
             elif char in [';']:
                 lexemas.append(Lexema("Punto y coma", char, fila, columna))                            
             elif char in [' ']:
